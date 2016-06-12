@@ -1,17 +1,23 @@
 #coding:utf-8
 from django.shortcuts import render
-
-# Create your views here.
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import  generics
+from rest_framework import permissions
+from rest_framework import  serializers
+
 from framework.models import BOOK
 from framework.serializer import BookSerializer
+from framework.restful_permission import IsReadOnly
+from framework.serializer import User_serilizers
+from rest_framework import viewsets
+
 
 #restful_api模版
 # class JSONResponse(HttpResponse):
@@ -19,18 +25,6 @@ from framework.serializer import BookSerializer
 #         content = JSONRenderer().render(data)
 #         kwargs['content_type'] = 'application/json'
 #         super(JSONResponse,self).__init__(content,**kwargs)
-
-
-# 通用视图写法
-# class book(generics.ListCreateAPIView):
-#     queryset = BOOK.objects.all()
-#     serializer_class = BookSerializer
-
-
-# def getbook(generics.List):
-#     queryset = BOOK.objects.all()
-#     serializer_class = BookSerializer
-
 
 #APIView写法
 class Book_list(APIView):
@@ -54,15 +48,30 @@ class Book_detail(APIView):
         ser = BookSerializer(books)
         return  Response(ser.data)
 
-
-#通用视图写法
-class Book_generic(generics.ListCreateAPIView):
+#通用视图写法,权限验证
+class BookGenerics(generics.ListCreateAPIView):
     queryset = BOOK.objects.all()
     serializer_class = BookSerializer
 
+#viewset视图写法,权限验证
+class BookViewsets(viewsets.ModelViewSet):
+    queryset = BOOK.objects.all()
+    serializer_class = BookSerializer
+
+    def pre_save(self,obj):
+        obj.owner = self.request.user
+
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsReadOnly)
+
+
+class UserList(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = User_serilizers
+
+
 # @api_view(['GET','POST','PUT','UPDATE','DELETE'])
 # def book_detail(request):
-#     try:
+#     try:
 #         queryset = BOOK.objects.all()
 #         print queryset['author']
 #     except Exception as e:
