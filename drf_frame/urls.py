@@ -5,10 +5,11 @@ from django.contrib import admin
 from framework.views import *
 from rest_framework import routers
 from framework import views
+from framework.api import API
 
 #路由注册
 router = routers.DefaultRouter()
-router.register(r'book', views.BookViewsets)
+router.register(r'bookViewset', views.BookViewsets)
 # # urlpatterns = router.urls
 
 urlpatterns = [
@@ -17,6 +18,8 @@ urlpatterns = [
     #restful_api的apiview写法
     # url(r'book/$',Book_list.as_view()),
     # url(r'book_detail/(\d+)',Book_detail.as_view()),
+    #APIView写法
+    url(r'bookAllApi/',API.as_view()),
 
     #restful_api的generic写法
     url(r'bookGeneric',BookGenerics.as_view()),
@@ -24,5 +27,8 @@ urlpatterns = [
     #路由模式
     url(r'^',include(router.urls)),
 
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    #api调用增删查改
+    url(r'^bookApi/',bookApi),
 ]

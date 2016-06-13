@@ -5,18 +5,19 @@ from django.contrib.auth.models import User
 
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import  generics
+from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import  serializers
+from rest_framework import viewsets
 
 from framework.models import BOOK
 from framework.serializer import BookSerializer
 from framework.restful_permission import IsReadOnly
 from framework.serializer import User_serilizers
-from rest_framework import viewsets
+
 
 
 #restful_api模版
@@ -41,7 +42,7 @@ class Book_list(APIView):
             return Response(ser.data)
         return Response(ser.errors)
 
-#单个查询
+#APIView用法
 class Book_detail(APIView):
     def get_detail(self,request,num,format=None):
         books = BOOK.objects.get(id=num)
@@ -69,38 +70,38 @@ class UserList(viewsets.ModelViewSet):
     serializer_class = User_serilizers
 
 
-# @api_view(['GET','POST','PUT','UPDATE','DELETE'])
-# def book_detail(request):
-#     try:
-#         queryset = BOOK.objects.all()
-#         print queryset['author']
-#     except Exception as e:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-#
-#     if request.method == 'GET':
-#         serializer = BookSerializer(queryset)
-#         return Response(serializer.data)
-#
-#     elif request.method == 'POST':
-#         serializer = BookSerializer(data=request.DATA)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return JSONResponse(serializer.data,status=status.HTTP_201_CREATED)
-#         else:
-#             return JSONResponse(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-#
-#     elif request.method == 'PUT':
-#         serializer = BookSerializer(book_object,data=request.DATA)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return JSONResponse(serializer.data)
-#         else:
-#             return JSONResponse(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-#
-#     elif request.method == 'DELETE':
-#         Book.delete()
-#         return JSONResponse(status=status.HTTP_204_NO_CONTENT)
-#     elif request.method == 'UPDATE':
-#         pass
-#     else:
-#         pass
+@api_view(['GET','POST','PUT','UPDATE','DELETE'])
+def bookApi(request):
+    try:
+        queryset = BOOK.objects.all()
+    except Exception as e:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = BookSerializer(queryset)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = BookSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        serializer = BookSerializer(BOOK,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        BOOK.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    elif request.method == 'UPDATE':
+        pass
+    else:
+        pass
+
