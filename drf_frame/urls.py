@@ -18,6 +18,7 @@ urlpatterns = [
     #restful_api的apiview写法
     # url(r'book/$',Book_list.as_view()),
     # url(r'book_detail/(\d+)',Book_detail.as_view()),
+
     #APIView写法
     url(r'bookAllApi/',API.as_view()),
 
@@ -30,5 +31,5 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
     #api调用增删查改
-    url(r'^bookApi/',bookApi),
+    url(r'^bookApi/(?P<pk>[0-9]+)/$',bookApi),
 ]

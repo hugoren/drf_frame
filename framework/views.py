@@ -21,11 +21,11 @@ from framework.serializer import User_serilizers
 
 
 #restful_api模版
-# class JSONResponse(HttpResponse):
-#     def __init__(self,data,**kwargs):
-#         content = JSONRenderer().render(data)
-#         kwargs['content_type'] = 'application/json'
-#         super(JSONResponse,self).__init__(content,**kwargs)
+class JSONResponse(HttpResponse):
+    def __init__(self,data,**kwargs):
+        content = JSONRenderer().render(data)
+        kwargs['content_type'] = 'application/json'
+        super(JSONResponse,self).__init__(content,**kwargs)
 
 #APIView写法
 class Book_list(APIView):
@@ -71,11 +71,11 @@ class UserList(viewsets.ModelViewSet):
 
 
 @api_view(['GET','POST','PUT','UPDATE','DELETE'])
-def bookApi(request):
+def bookApi(request,pk):
     try:
-        queryset = BOOK.objects.all()
+        queryset = BOOK.objects.get(pk=pk)
     except Exception as e:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return JSONResponse(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = BookSerializer(queryset)
