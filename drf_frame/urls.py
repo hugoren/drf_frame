@@ -22,14 +22,20 @@ urlpatterns = [
     #APIView写法
     url(r'bookAllApi/',API.as_view()),
 
+    #api调用增删查改
+    url(r'^bookApi/(?P<pk>[0-9]+)/$',bookApi),
+
     #restful_api的generic写法
     url(r'bookGeneric',BookGenerics.as_view()),
 
-    #路由模式
+    #路由模式,viewset
     url(r'^',include(router.urls)),
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    #api调用增删查改
-    url(r'^bookApi/(?P<pk>[0-9]+)/$',bookApi),
+    #mixins模式
+
+    url(r'^bookMixins',BookMixins.as_view()),
+
+
 ]
