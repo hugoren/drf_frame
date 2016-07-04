@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.http import Http404
 
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
@@ -14,10 +15,17 @@ from rest_framework import  serializers
 from rest_framework import viewsets
 from rest_framework import mixins
 
+
 from framework.models import BOOK
 from framework.serializer import BookSerializer
 from framework.restful_permission import IsReadOnly
 from framework.serializer import User_serilizers
+from framework.trace_log import log_info
+
+
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 
 
@@ -30,6 +38,16 @@ class JSONResponse(HttpResponse):
 
 #APIView写法
 class Book_list(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        content = {
+            'user': unicode(request.user),  # `django.contrib.auth.User` instance.
+            'auth': unicode(request.auth),  # None
+        }
+        return Response(content)
 
     def get(self,request,format=None):
         books = BOOK.objects.all()
@@ -44,20 +62,26 @@ class Book_list(APIView):
         return Response(ser.errors)
 
 #APIView用法
-class Book_detail(APIView):
+class BookApiView(APIView):
 
-    def get_detail(self,request,pk,format=None):
-        books = BOOK.objects.get(id=pk)
-        ser = BookSerializer(books)
-        return  Response(ser.data)
+    def get_object(self, pk):
+        try:
+            return BOOK.objects.get(pk=pk)
+        except BOOK.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        serializer = BookSerializer(snippet)
+        return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-            snippet = self.get_object(pk)
-            serializer = BookSerializer(snippet, data=request.DATA)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        snippet = self.get_object(pk)
+        serializer = BookSerializer(snippet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         snippet = self.get_object(pk)
@@ -69,8 +93,10 @@ class BookGenerics(generics.ListCreateAPIView):
     queryset = BOOK.objects.all()
     serializer_class = BookSerializer
 
+
 #viewset视图写法,权限验证
 class BookViewsets(viewsets.ModelViewSet):
+    log_info('viewset视图写法,权限验证')
     queryset = BOOK.objects.all()
     serializer_class = BookSerializer
 

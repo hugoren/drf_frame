@@ -19,3 +19,14 @@ class BOOK(models.Model):
     #
     # class Meta:
     #     ordering = ('id',)
+
+
+class YMATOULOG(models.Model):
+    operater = models.CharField(max_length=200)
+    app = models.CharField(max_length=200)
+    message = models.CharField(max_length=1000)
+    create_date = models.DateTimeField('保存日期',auto_now_add = True)
+
+
+    def __unicode__(self):
+        return self.operater

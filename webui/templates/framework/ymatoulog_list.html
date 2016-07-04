@@ -1,0 +1,73 @@
+{% extends "webui/layout.html" %}
+{% load webui_extras %}
+
+{% load pagination_tags %}
+{% autopaginate ymatoulog_list %}
+
+{% block content %}
+
+<div class="row" xmlns="http://www.w3.org/1999/html">
+    {% if notification %}
+        <p class="alert alert-info">{{ notification }}</p>
+    {% endif %}
+</div>
+
+<h2>{{ title }}</h2>
+<p>{{ introduction }}</p>
+
+<div class="row">
+    <nav>
+        <div class="pull-right">
+            <form action="{% url 'serverLog-list' %}" method="get" class="form-inline" role="search" >
+                <div class="form-group" >{{ form.app }}</div>
+                <div class="form-group" >{{ form.operater }}</div>
+                <div class="form-group" ><button class="btn btn-default" type="submit">搜索</button></div>
+            </form>
+        </div>
+    </nav>
+</div>
+
+<nav class="pull-right">
+    {% paginate %}
+</nav>
+
+<p></p>
+
+<div class="row">
+
+    {% if taskstatus_list.count = 0 %}
+        <div class="alert alert-info">
+            <p>sorry,暂查不到相关任务状态信息，请检查检索issue_key是否有误</p>
+        </div>
+    {% endif %}
+
+<!--跟踪发布状态-->
+
+
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>operater</th>
+          <th>app</th>
+          <th>message</th>
+          <th>操作时间</th>
+        </tr>
+      </thead>
+      <tbody>
+       {% for trackstatus in ymatoulog_list %}
+        <tr >
+
+              <td>{{trackstatus.issue_key}}</td>
+              <td>{{trackstatus.status_name}}</td>
+              <td>{{trackstatus.status_message}}</td>
+              <td>{{trackstatus.create_time}}</td>
+
+
+        </tr>
+      {% endfor%}
+      </tbody>
+    </table>
+</div>
+
+{% endblock %}
