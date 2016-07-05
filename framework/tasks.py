@@ -1,5 +1,10 @@
 #coding:utf-8
 from __future__ import absolute_import
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
 
 from drf_frame.celery import app
 from celery import  shared_task
@@ -28,21 +33,14 @@ class DBREAD(APIView):
 
                 operater = req.POST.get('operater')
                 message = req.POST.get('message')
-                r_dict = {'operater':operater,'message':message}
+                app = req.POST.get('app')
+                r_dict = {'operater':operater,'message':message,'app':app}
 
                 '''
                 数据写入redis队列
                 '''
                 r = redis_queue.RedisQueue('log')
                 r.put(r_dict)
-
-                # '''
-                # 取队列数据入库
-                # '''
-                # q = r.get()
-                # q_dict = eval(q)
-                # write_db = YMATOULOG(operater=q_dict['operater'],app='test',message=q_dict['message'])
-                # write_db.save()
 
                 return Response('success')
 
@@ -59,10 +57,10 @@ class DBREAD(APIView):
 @shared_task
 def get_redis_queue():
     '''
-     取队列数据入库
+     取队列数据入mysql库
     '''
     r = redis_queue.RedisQueue('log')
     q = r.get()
     q_dict = eval(q)
-    write_db = YMATOULOG(operater=q_dict['operater'],app='test',message=q_dict['message'])
+    write_db = YMATOULOG(operater=q_dict['operater'],app=q_dict['app'],message=q_dict['message'])
     write_db.save()

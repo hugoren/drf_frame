@@ -22,6 +22,12 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drf_frame.settings')
-# app = Celery('framework',include=['framework.dbCenter','framework.dbWrite','framework.task','framework.call_task'])
-# app.config_from_object('framework.config')
+# CELERYBEAT_SCHEDULE = {
+#     'add-every-1-seconds': {
+#         'task': 'input_mysql',
+#         'schedule': timedelta(seconds=1),
+#         'args': (16, 16)
+#     },
+# }
+#
+# CELERY_TIMEZONE = 'Asia/Shanghai'
