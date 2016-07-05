@@ -27,8 +27,8 @@ class SearchLogView(ListView):
 
         # add search form
         context['form'] = self.get_form()
-        context['title'] = u'日志系统'
-        context['introduction'] = u'日志系统简介'
+        # context['title'] = u'日志系统'
+        # context['introduction'] = u'日志系统简介'
 
         # show maintenance notification. If it's empty, the notification will not be appeared in the page.
         context['notification'] = u''

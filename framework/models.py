@@ -24,7 +24,7 @@ class BOOK(models.Model):
 class YMATOULOG(models.Model):
     operater = models.CharField(max_length=200)
     app = models.CharField(max_length=200)
-    message = models.CharField(max_length=1000)
+    message = models.CharField(max_length=5000)
     create_date = models.DateTimeField('保存日期',auto_now_add = True)
 
 
